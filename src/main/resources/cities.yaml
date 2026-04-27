@@ -1,0 +1,17 @@
+app:
+  cities:
+    Minsk:
+      lat: 53.9006011
+      lon: 27.558972
+    London:
+      lat: 51.5072178
+      lon: -0.1275862
+    Tokyo:
+      lat: 35.6764225
+      lon: 139.650027
+    Shanghai:
+      lat: 31.230416
+      lon: 121.473701
+    Warsaw:
+      lat: 52.2296756
+      lon: 21.0122287
