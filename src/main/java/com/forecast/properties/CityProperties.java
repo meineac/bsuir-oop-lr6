@@ -7,13 +7,20 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Getter
-@Setter
 @Component
 @ConfigurationProperties(prefix = "app")
 public class CityProperties {
     private Map<String, Coordinate> cities;
+
+    public void setCities(Map<String, Coordinate> cities) {
+        this.cities = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        if (cities != null) {
+            this.cities.putAll(cities);
+        }
+    }
 
     @Getter
     @Setter
