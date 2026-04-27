@@ -2,6 +2,7 @@ package com.forecast.service;
 
 import com.forecast.properties.CityProperties;
 import com.forecast.properties.CityProperties.Coordinate;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -12,16 +13,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationResolverTest {
 
-    @Test
-    void resolve_ValidCity() {
-        CityProperties properties = new CityProperties();
+    private static CityProperties properties;
+    private static LocationResolver resolver;
+
+    @BeforeAll
+    static void setUp() {
+        properties = new CityProperties();
         Coordinate minskCoords = new Coordinate();
         minskCoords.setLat(new BigDecimal("53.9006"));
         minskCoords.setLon(new BigDecimal("27.5590"));
         properties.setCities(Map.of("Minsk", minskCoords));
+        resolver = new LocationResolver(properties);
+    }
 
-        LocationResolver resolver = new LocationResolver(properties);
-
+    @Test
+    void resolve_ValidCity() {
         CityProperties.Coordinate result = resolver.resolve("Minsk");
 
         assertEquals(new BigDecimal("53.9006"), result.getLat());
@@ -30,10 +36,7 @@ public class LocationResolverTest {
 
     @Test
     void resolve_InvalidCity() {
-        CityProperties properties = new CityProperties();
-        properties.setCities(Map.of());
 
-        LocationResolver resolver = new LocationResolver(properties);
         assertThrows(IllegalArgumentException.class, () -> resolver.resolve("UnknownCity"));
     }
 }
