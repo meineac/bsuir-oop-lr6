@@ -22,7 +22,7 @@ public class LocationResolverTest {
         Coordinate minskCoords = new Coordinate();
         minskCoords.setLat(new BigDecimal("53.9006"));
         minskCoords.setLon(new BigDecimal("27.5590"));
-        properties.setCities(Map.of("Minsk", minskCoords));
+        properties.getCities().put("Minsk", minskCoords);
         resolver = new LocationResolver(properties);
     }
 

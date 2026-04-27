@@ -13,14 +13,7 @@ import java.util.TreeMap;
 @Component
 @ConfigurationProperties(prefix = "app")
 public class CityProperties {
-    private Map<String, Coordinate> cities;
-
-    public void setCities(Map<String, Coordinate> cities) {
-        this.cities = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        if (cities != null) {
-            this.cities.putAll(cities);
-        }
-    }
+    private final Map<String, Coordinate> cities = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);;
 
     @Getter
     @Setter
