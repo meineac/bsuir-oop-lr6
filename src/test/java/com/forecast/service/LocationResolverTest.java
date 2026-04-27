@@ -6,19 +6,17 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationResolverTest {
 
-    private static CityProperties properties;
     private static LocationResolver resolver;
 
     @BeforeAll
     static void setUp() {
-        properties = new CityProperties();
+        CityProperties properties = new CityProperties();
         Coordinate minskCoords = new Coordinate();
         minskCoords.setLat(new BigDecimal("53.9006"));
         minskCoords.setLon(new BigDecimal("27.5590"));
