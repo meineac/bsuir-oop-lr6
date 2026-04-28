@@ -56,6 +56,12 @@ public class WeatherController {
         return new StatusResponse(400, "invalid coordinates");
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public StatusResponse handleIllegalArgumentException(IllegalArgumentException exception) {
+        return new StatusResponse(400, exception.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public StatusResponse handleException(Exception exception) {
