@@ -30,24 +30,26 @@ public class WeatherController {
     private final WeatherService service;
     private final LocationResolver locationResolver;
 
-    @GetMapping(value = "/weather", params = {"lat", "lon"})
+    @GetMapping(value = "/weather")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get Weather by Coordinates", description = "Returns current weather for given coordinates")
-    public SuccessResponse<CurrentWeather> getCurrentWeatherByCoordinates(
-            @Parameter(description = "Latitude", required = true, example = "53.9006") @RequestParam BigDecimal lat,
-            @Parameter(description = "Longitude", required = true, example = "27.5590") @RequestParam BigDecimal lon) {
-        CurrentWeather result = service.getCurrentWeather(lat, lon);
-        return new SuccessResponse<>(200, "Success", result);
-    }
+    @Operation(summary = "Get Weather", description = "Get weather by city name OR lat/lon coordinates")
+    public SuccessResponse<CurrentWeather> getCurrentWeather(
+            @Parameter(description = "Latitude", required = false, example = "53.9006")
+            @RequestParam(required = false) BigDecimal lat,
 
-    @GetMapping(value = "/weather", params = "city")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get Weather by City", description = "Returns current weather for a specific city")
-    public SuccessResponse<CurrentWeather> getCurrentWeatherByCity(
-            @Parameter(description = "City name", required = true, example = "Minsk") @RequestParam String city) {
-        var coords = locationResolver.resolve(city);
-        CurrentWeather result = service.getCurrentWeather(coords.getLat(), coords.getLon());
-        return new SuccessResponse<>(200, "Success", result);
+            @Parameter(description = "Longitude", required = false, example = "27.5590")
+            @RequestParam(required = false) BigDecimal lon,
+
+            @Parameter(description = "City name", required = false, example = "Minsk")
+            @RequestParam(required = false) String city) {
+        if (city != null) {
+            var coords = locationResolver.resolve(city);
+            return new SuccessResponse<>(200, "Success", service.getCurrentWeather(coords.getLat(), coords.getLon()));
+        } else if (lat != null && lon != null) {
+            return new SuccessResponse<>(200, "Success", service.getCurrentWeather(lat, lon));
+        } else {
+            throw new IllegalArgumentException("Provide either 'city' or both 'lat' and 'lon'");
+        }
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
