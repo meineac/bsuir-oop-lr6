@@ -1,6 +1,8 @@
 package com.forecast.controller;
 
 import com.forecast.model.CurrentWeather;
+import com.forecast.properties.CityProperties;
+import com.forecast.service.LocationResolver;
 import com.forecast.service.WeatherService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class WeatherControllerTest {
 
     @MockitoBean
     private WeatherService service;
+
+    @MockitoBean
+    private LocationResolver locationResolver;
 
     @Test
     void getCurrentWeather_Success() throws Exception {
@@ -66,5 +71,25 @@ public class WeatherControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.code").value(500))
                 .andExpect(jsonPath("$.message").value("Unexpected error"));
+    }
+
+    @Test
+    void getCurrentWeatherByCity_Success() throws Exception {
+        CityProperties.Coordinate mockCoords = new CityProperties.Coordinate();
+        mockCoords.setLat(new BigDecimal("53.9006"));
+        mockCoords.setLon(new BigDecimal("27.5590"));
+
+        CurrentWeather mockWeather = new CurrentWeather(new BigDecimal("15.5"));
+
+        when(locationResolver.resolve("Minsk")).thenReturn(mockCoords);
+        when(service.getCurrentWeather(new BigDecimal("53.9006"), new BigDecimal("27.5590")))
+                .thenReturn(mockWeather);
+
+        mockMvc.perform(get("/api/v1/weather/city")
+                        .param("city", "Minsk")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.temperature").value(15.5));
     }
 }
