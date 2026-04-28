@@ -34,13 +34,13 @@ public class WeatherController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get Weather", description = "Get weather by city name OR lat/lon coordinates")
     public SuccessResponse<CurrentWeather> getCurrentWeather(
-            @Parameter(description = "Latitude", required = false, example = "53.9006")
+            @Parameter(description = "Latitude", example = "53.9006")
             @RequestParam(required = false) BigDecimal lat,
 
-            @Parameter(description = "Longitude", required = false, example = "27.5590")
+            @Parameter(description = "Longitude", example = "27.5590")
             @RequestParam(required = false) BigDecimal lon,
 
-            @Parameter(description = "City name", required = false, example = "Minsk")
+            @Parameter(description = "City name", example = "Minsk")
             @RequestParam(required = false) String city) {
         if (city != null) {
             var coords = locationResolver.resolve(city);
