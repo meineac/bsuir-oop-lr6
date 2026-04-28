@@ -32,15 +32,21 @@ public class WeatherControllerTest {
     @MockitoBean
     private LocationResolver locationResolver;
 
+    private static final String PROVIDER = "openweather";
+
     @Test
     void getCurrentWeather_Success() throws Exception {
         CurrentWeather mockWeather = new CurrentWeather(new BigDecimal("22.5"));
-        when(service.getCurrentWeather(new BigDecimal("53.9006"), new BigDecimal("27.5590")))
+        when(service.getCurrentWeather(
+                new BigDecimal("53.9006"),
+                new BigDecimal("27.5590"),
+                PROVIDER))
                 .thenReturn(mockWeather);
 
         mockMvc.perform(get("/api/v1/weather")
                         .param("lat", "53.9006")
                         .param("lon", "27.5590")
+                        .param("provider", PROVIDER)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
@@ -53,6 +59,7 @@ public class WeatherControllerTest {
         mockMvc.perform(get("/api/v1/weather")
                         .param("lat", "invalid")
                         .param("lon", "27.5590")
+                        .param("provider", PROVIDER)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
@@ -61,12 +68,13 @@ public class WeatherControllerTest {
 
     @Test
     void getCurrentWeather_ServiceThrowsException_ReturnsInternalServerError() throws Exception {
-        when(service.getCurrentWeather(any(), any()))
+        when(service.getCurrentWeather(any(), any(), any()))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
         mockMvc.perform(get("/api/v1/weather")
                         .param("lat", "53.9006")
                         .param("lon", "27.5590")
+                        .param("provider", PROVIDER)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.code").value(500))
@@ -82,11 +90,12 @@ public class WeatherControllerTest {
         CurrentWeather mockWeather = new CurrentWeather(new BigDecimal("15.5"));
 
         when(locationResolver.resolve("Minsk")).thenReturn(mockCoords);
-        when(service.getCurrentWeather(new BigDecimal("53.9006"), new BigDecimal("27.5590")))
+        when(service.getCurrentWeather(new BigDecimal("53.9006"), new BigDecimal("27.5590"), PROVIDER))
                 .thenReturn(mockWeather);
 
         mockMvc.perform(get("/api/v1/weather")
                         .param("city", "Minsk")
+                        .param("provider", PROVIDER)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
@@ -99,8 +108,9 @@ public class WeatherControllerTest {
                 new IllegalArgumentException("Unsupported city: Atlantis"));
 
         mockMvc.perform(get("/api/v1/weather")
-                .param("city", "Atlantis")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .param("city", "Atlantis")
+                        .param("provider", PROVIDER)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("Unsupported city: Atlantis"));

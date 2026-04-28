@@ -1,6 +1,10 @@
 package com.forecast.config;
 
+import java.util.List;
 import java.util.Map;
+
+import com.forecast.client.WeatherDataClient;
+import com.forecast.service.WeatherClientRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -16,5 +20,10 @@ public class ClientsConfig {
                 .baseUrl(properties.getBaseUrl())
                 .defaultUriVariables(Map.of("apiKey", properties.getApiKey()))
                 .build();
+    }
+
+    @Bean
+    WeatherClientRegistry weatherClientRegistry(List<WeatherDataClient> clients) {
+        return new WeatherClientRegistry(clients);
     }
 }

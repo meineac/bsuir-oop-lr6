@@ -41,16 +41,19 @@ public class WeatherController {
             @RequestParam(required = false) BigDecimal lon,
 
             @Parameter(description = "City name", example = "Minsk")
-            @RequestParam(required = false) String city) {
+            @RequestParam(required = false) String city,
+
+            @Parameter(description = "Provider name", required = true, example = "openweather")
+            @RequestParam String provider) {
 
         if (lat != null && lon != null) {
-            return new SuccessResponse<>(200, "Success", service.getCurrentWeather(lat, lon));
+            return new SuccessResponse<>(200, "Success", service.getCurrentWeather(lat, lon, provider));
         } else if (city != null) {
             var coords = locationResolver.resolve(city);
             return new SuccessResponse<>(
                     200,
                     "Success",
-                    service.getCurrentWeather(coords.getLat(), coords.getLon())
+                    service.getCurrentWeather(coords.getLat(), coords.getLon(), provider)
             );
         } else {
             throw new IllegalArgumentException("Provide either 'city' or both 'lat' and 'lon'");
