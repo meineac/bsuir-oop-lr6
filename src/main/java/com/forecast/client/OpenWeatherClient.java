@@ -49,4 +49,9 @@ public class OpenWeatherClient implements WeatherDataClient {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public String getProviderName() {
+        return "openweather";
+    }
 }

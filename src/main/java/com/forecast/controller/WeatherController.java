@@ -42,11 +42,16 @@ public class WeatherController {
 
             @Parameter(description = "City name", example = "Minsk")
             @RequestParam(required = false) String city) {
-        if (city != null) {
-            var coords = locationResolver.resolve(city);
-            return new SuccessResponse<>(200, "Success", service.getCurrentWeather(coords.getLat(), coords.getLon()));
-        } else if (lat != null && lon != null) {
+
+        if (lat != null && lon != null) {
             return new SuccessResponse<>(200, "Success", service.getCurrentWeather(lat, lon));
+        } else if (city != null) {
+            var coords = locationResolver.resolve(city);
+            return new SuccessResponse<>(
+                    200,
+                    "Success",
+                    service.getCurrentWeather(coords.getLat(), coords.getLon())
+            );
         } else {
             throw new IllegalArgumentException("Provide either 'city' or both 'lat' and 'lon'");
         }
