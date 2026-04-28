@@ -52,7 +52,7 @@ public class WeatherController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public StatusResponse handleArgumentTypeException(Exception exception) {
+    public StatusResponse handleArgumentTypeException() {
         return new StatusResponse(400, "invalid coordinates");
     }
 
