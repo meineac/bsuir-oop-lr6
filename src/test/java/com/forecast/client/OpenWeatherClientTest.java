@@ -1,5 +1,6 @@
 package com.forecast.client;
 
+import com.forecast.model.ForecastWeather;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
@@ -9,6 +10,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -103,6 +105,36 @@ class OpenWeatherClientTest {
 
         assertEquals("failed to decode response: missing temperature data", exception.getMessage());
 
+        mockServer.verify();
+    }
+
+    @Test
+    void getForecast_Success() {
+        String jsonResponse = """
+                {
+                    "list": [
+                        {
+                            "dt": 1682424000,
+                            "main": {
+                                "temp_min": 8.5,
+                                "temp_max": 14.2
+                            }
+                        }
+                    ]
+                }
+                """;
+
+        mockServer.expect(requestTo("http://mock-openweather.com/forecast?appid=test-api-key&" +
+                        "lat=53.9006&lon=27.5590&units=metric"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
+
+        ForecastWeather result = client.getForecast(new BigDecimal("53.9006"), new BigDecimal("27.5590"));
+
+        assertEquals(1, result.getDays().size());
+        assertEquals(new BigDecimal("8.5"), result.getDays().get(0).getMinTemperature());
+        assertEquals(new BigDecimal("14.2"), result.getDays().get(0).getMaxTemperature());
+        assertEquals(LocalDate.ofEpochDay(1682424000L / 86400L), result.getDays().get(0).getDate());
         mockServer.verify();
     }
 }
