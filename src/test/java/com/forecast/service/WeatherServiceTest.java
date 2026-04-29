@@ -95,4 +95,17 @@ public class WeatherServiceTest {
         verify(registry).get(PROVIDER);
         verify((ForecastDataClient) hybridClient).getForecast(lat, lon);
     }
+
+    @Test
+    void getForecastWeather_UnsupportedProvider_ThrowsException() {
+        BigDecimal lat = new BigDecimal("53.9006");
+        BigDecimal lon = new BigDecimal("27.5590");
+
+        when(registry.get(PROVIDER)).thenReturn(currentWeatherClient); // client mock only implements WeatherDataClient
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                weatherService.getForecastWeather(lat, lon, PROVIDER));
+
+        assertEquals("Provider openweather does not support forecasting", exception.getMessage());
+    }
 }
