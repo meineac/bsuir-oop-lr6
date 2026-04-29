@@ -9,8 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WeatherClientRegistryTest {
     static private WeatherClientRegistry registry;
@@ -35,7 +34,8 @@ public class WeatherClientRegistryTest {
     @ParameterizedTest
     @ValueSource(strings = {"openweather", "weatherapi"})
     void get_KnownProviders(String providerName) {
-        WeatherDataClient client = registry.get(providerName);
+        var rawClient = registry.get(providerName);
+        WeatherDataClient client = assertInstanceOf(WeatherDataClient.class, rawClient);
         assertEquals(providerName, client.getProviderName());
     }
 

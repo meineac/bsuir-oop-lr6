@@ -4,6 +4,6 @@ import com.forecast.model.ForecastWeather;
 
 import java.math.BigDecimal;
 
-public interface ForecastDataClient {
+public interface ForecastDataClient extends WeatherProvider {
     ForecastWeather getForecast(BigDecimal lat, BigDecimal lon);
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.forecast.client.WeatherDataClient;
+import com.forecast.client.WeatherProvider;
 import com.forecast.properties.GoogleWeatherProperties;
 import com.forecast.service.WeatherClientRegistry;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +33,7 @@ public class ClientsConfig {
     }
 
     @Bean
-    WeatherClientRegistry weatherClientRegistry(List<WeatherDataClient> clients) {
+    WeatherClientRegistry weatherClientRegistry(List<WeatherProvider> clients) {
         return new WeatherClientRegistry(clients);
     }
 }

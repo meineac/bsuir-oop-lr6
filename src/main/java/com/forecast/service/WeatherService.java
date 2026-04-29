@@ -3,6 +3,7 @@ package com.forecast.service;
 import java.math.BigDecimal;
 
 import com.forecast.client.ForecastDataClient;
+import com.forecast.client.WeatherDataClient;
 import com.forecast.model.ForecastWeather;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,11 @@ public class WeatherService {
     private final WeatherClientRegistry registry;
 
     public CurrentWeather getCurrentWeather(BigDecimal lat, BigDecimal lon, String provider) {
-        BigDecimal temperature = registry.get(provider).getCurrentTemperature(lat, lon);
-        return new CurrentWeather(temperature);
+        var client = registry.get(provider);
+        if (!(client instanceof WeatherDataClient weatherDataClient)) {
+            throw new IllegalArgumentException("Provider " + provider + " does not support current weather retrieval");
+        }
+        return new CurrentWeather(weatherDataClient.getCurrentTemperature(lat, lon));
     }
 
     public ForecastWeather getForecastWeather(BigDecimal lat, BigDecimal lon, String provider) {

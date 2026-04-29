@@ -81,19 +81,14 @@ public class WeatherServiceTest {
                 )
         ));
 
-        WeatherDataClient hybridClient = org.mockito.Mockito.mock(
-                WeatherDataClient.class,
-                org.mockito.Mockito.withSettings().extraInterfaces(ForecastDataClient.class)
-        );
-
-        when(registry.get(PROVIDER)).thenReturn(hybridClient);
-        when(((ForecastDataClient) hybridClient).getForecast(lat, lon)).thenReturn(expectedForecast);
+        when(registry.get(PROVIDER)).thenReturn(forecastDataClient);
+        when((forecastDataClient).getForecast(lat, lon)).thenReturn(expectedForecast);
 
         ForecastWeather result = weatherService.getForecastWeather(lat, lon, PROVIDER);
 
         assertEquals(expectedForecast.getDays().size(), result.getDays().size());
         verify(registry).get(PROVIDER);
-        verify((ForecastDataClient) hybridClient).getForecast(lat, lon);
+        verify(forecastDataClient).getForecast(lat, lon);
     }
 
     @Test
