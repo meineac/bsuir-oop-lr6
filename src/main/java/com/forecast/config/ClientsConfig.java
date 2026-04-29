@@ -3,7 +3,6 @@ package com.forecast.config;
 import java.util.List;
 import java.util.Map;
 
-import com.forecast.client.WeatherDataClient;
 import com.forecast.client.WeatherProvider;
 import com.forecast.properties.GoogleWeatherProperties;
 import com.forecast.service.WeatherClientRegistry;

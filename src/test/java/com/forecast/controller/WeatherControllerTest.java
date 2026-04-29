@@ -1,6 +1,7 @@
 package com.forecast.controller;
 
 import com.forecast.model.CurrentWeather;
+import com.forecast.model.ForecastWeather;
 import com.forecast.properties.CityProperties;
 import com.forecast.service.LocationResolver;
 import com.forecast.service.WeatherService;
@@ -12,6 +13,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -114,5 +117,54 @@ public class WeatherControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("Unsupported city: Atlantis"));
+    }
+
+    @Test
+    void getForecastWeather_Success() throws  Exception {
+        ForecastWeather mockForecast = new ForecastWeather(List.of(
+                new ForecastWeather.DailyForecast(
+                        LocalDate.of(2023, 4, 25),
+                        new BigDecimal("10.0"),
+                        new BigDecimal("15.0")
+                )
+        ));
+
+        when(service.getForecastWeather(
+                new BigDecimal("53.9006"),
+                new BigDecimal("27.5590"),
+                PROVIDER))
+                .thenReturn(mockForecast);
+
+        mockMvc.perform(get("/api/v1/forecast")
+                        .param("lat", "53.9006")
+                        .param("lon", "27.5590")
+                        .param("provider", PROVIDER)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("Success"))
+                .andExpect(jsonPath("$.data.days[0].minTemperature").value(10.0))
+                .andExpect(jsonPath("$.data.days[0].maxTemperature").value(15.0));
+    }
+
+    @Test
+    void getForecastWeatherByCity_Success() throws Exception {
+        CityProperties.Coordinate mockCoords = new CityProperties.Coordinate();
+        mockCoords.setLat(new BigDecimal("53.9006"));
+        mockCoords.setLon(new BigDecimal("27.5590"));
+
+        ForecastWeather mockForecast = new ForecastWeather(List.of());
+
+        when(locationResolver.resolve("Minsk")).thenReturn(mockCoords);
+        when(service.getForecastWeather(new BigDecimal("53.9006"), new BigDecimal("27.5590"), PROVIDER))
+                .thenReturn(mockForecast);
+
+        mockMvc.perform(get("/api/v1/forecast")
+                        .param("city", "Minsk")
+                        .param("provider", PROVIDER)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
     }
 }
