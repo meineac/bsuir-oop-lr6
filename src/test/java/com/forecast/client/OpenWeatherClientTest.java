@@ -132,9 +132,9 @@ class OpenWeatherClientTest {
         ForecastWeather result = client.getForecast(new BigDecimal("53.9006"), new BigDecimal("27.5590"));
 
         assertEquals(1, result.getDays().size());
-        assertEquals(new BigDecimal("8.5"), result.getDays().get(0).getMinTemperature());
-        assertEquals(new BigDecimal("14.2"), result.getDays().get(0).getMaxTemperature());
-        assertEquals(LocalDate.ofEpochDay(1682424000L / 86400L), result.getDays().get(0).getDate());
+        assertEquals(new BigDecimal("8.5"), result.getDays().getFirst().getMinTemperature());
+        assertEquals(new BigDecimal("14.2"), result.getDays().getFirst().getMaxTemperature());
+        assertEquals(LocalDate.ofEpochDay(1682424000L / 86400L), result.getDays().getFirst().getDate());
         mockServer.verify();
     }
 }

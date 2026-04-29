@@ -1,7 +1,11 @@
 package com.forecast.client;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.forecast.model.ForecastWeather;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -15,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class OpenWeatherClient implements WeatherDataClient {
+public class OpenWeatherClient implements WeatherDataClient, ForecastDataClient {
 
     @Qualifier("openWeatherRestClient")
     private final RestClient restClient;
@@ -53,5 +57,42 @@ public class OpenWeatherClient implements WeatherDataClient {
     @Override
     public String getProviderName() {
         return "openweather";
+    }
+
+    @Override
+    public ForecastWeather getForecast(BigDecimal lat, BigDecimal lon) {
+        var response = restClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/forecast")
+                        .queryParam("appid", "{apiKey}")
+                        .queryParam("lat", lat.toString())
+                        .queryParam("lon", lon.toString())
+                        .queryParam("units", "metric")
+                        .build())
+                .retrieve()
+                .toEntity(String.class);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(response.getBody());
+            JsonNode listNode = rootNode.get("list");
+
+            if (listNode == null || !listNode.isArray()) {
+                throw new RuntimeException("failed to decode response: missing forecast list");
+            }
+
+            List<ForecastWeather.DailyForecast> days = new ArrayList<>();
+            for (JsonNode node : listNode) {
+                JsonNode mainNode = node.get("main");
+                long timestamp = node.get("dt").asLong();
+                LocalDate date = LocalDate.ofEpochDay(timestamp / 86400L);
+                BigDecimal minTemp = new BigDecimal(mainNode.get("temp_min").asText());
+                BigDecimal maxTemp = new BigDecimal(mainNode.get("temp_max").asText());
+                days.add(new ForecastWeather.DailyForecast(date, minTemp, maxTemp));
+            }
+
+            return new ForecastWeather(days);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
