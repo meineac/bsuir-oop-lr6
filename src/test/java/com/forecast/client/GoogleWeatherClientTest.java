@@ -3,6 +3,8 @@ package com.forecast.client;
 import com.forecast.model.ForecastWeather;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -133,6 +135,32 @@ public class GoogleWeatherClientTest {
         assertEquals(new BigDecimal("2"), result.getDays().getFirst().getMinTemperature());
         assertEquals(new BigDecimal("10.1"), result.getDays().getFirst().getMaxTemperature());
         assertEquals(LocalDate.of(2026, 4, 30), result.getDays().getFirst().getDate());
+        mockServer.verify();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            """
+            {
+                "forecastDays": [
+                ]
+            }
+            """,
+            """
+            {
+            }
+            """
+    })
+    void getForecast_EmptyList(String jsonResponse) {
+        mockServer.expect(requestTo("http://mock-googleweather.com/forecast/days:lookup?" +
+                        "key=test-api-key&location.latitude=53.9006&location.longitude=27.5590"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(jsonResponse, MediaType.APPLICATION_JSON));
+
+        var exception = assertThrows(RuntimeException.class, () ->
+                client.getForecast(new BigDecimal("53.9006"), new BigDecimal("27.5590")));
+
+        assertEquals("failed to decode response: missing forecast list", exception.getMessage());
         mockServer.verify();
     }
 }

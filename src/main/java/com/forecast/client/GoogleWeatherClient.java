@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -59,6 +58,7 @@ public class GoogleWeatherClient implements WeatherDataClient, ForecastDataClien
                         .queryParam("key", "{apiKey}")
                         .queryParam("location.latitude", lat.toString())
                         .queryParam("location.longitude", lon.toString())
+                        .queryParam("pageSize", "10")
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (_, resp) -> {
