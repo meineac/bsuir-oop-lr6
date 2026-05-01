@@ -17,9 +17,7 @@ public class LocationResolverTest {
     @BeforeAll
     static void setUp() {
         CityProperties properties = new CityProperties();
-        Coordinate minskCoords = new Coordinate();
-        minskCoords.setLat(new BigDecimal("53.9006"));
-        minskCoords.setLon(new BigDecimal("27.5590"));
+        Coordinate minskCoords = new Coordinate(new BigDecimal("53.9006"), new BigDecimal("27.5590"));
         properties.getCities().put("Minsk", minskCoords);
         resolver = new LocationResolver(properties);
     }

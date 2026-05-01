@@ -86,9 +86,7 @@ public class WeatherControllerTest {
 
     @Test
     void getCurrentWeatherByCity_Success() throws Exception {
-        Coordinate mockCoords = new Coordinate();
-        mockCoords.setLat(new BigDecimal("53.9006"));
-        mockCoords.setLon(new BigDecimal("27.5590"));
+        Coordinate mockCoords = new Coordinate(new BigDecimal("53.9006"), new BigDecimal("27.5590"));
 
         CurrentWeather mockWeather = new CurrentWeather(new BigDecimal("15.5"));
 
@@ -149,7 +147,7 @@ public class WeatherControllerTest {
 
     @Test
     void getForecastWeatherByCity_Success() throws Exception {
-        Coordinate mockCoords = new Coordinate();
+        Coordinate mockCoords = new Coordinate(new BigDecimal("53.9006"), new BigDecimal("27.5590"));
         mockCoords.setLat(new BigDecimal("53.9006"));
         mockCoords.setLon(new BigDecimal("27.5590"));
 

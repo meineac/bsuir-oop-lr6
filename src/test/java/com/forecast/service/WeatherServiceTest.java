@@ -5,7 +5,6 @@ import com.forecast.client.WeatherDataClient;
 import com.forecast.model.Coordinate;
 import com.forecast.model.CurrentWeather;
 import com.forecast.model.ForecastWeather;
-import com.forecast.properties.CityProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
